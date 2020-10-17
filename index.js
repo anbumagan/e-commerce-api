@@ -39,7 +39,10 @@ app.post("/api/signup" ,(req,res)=>{
         email: req.body.email,
         password: req.body.password,
         mobile_no:null,
-        address: [],
+        address: null,
+        district:null,
+        city:null,
+        pincode:null,
         orders:[]
      }
      dbo.collection("customers").insertOne(query, function(err, res1) {
@@ -127,6 +130,34 @@ app.post("/api/customerdetails",(req,res)=>{
             console.log(result)
             db.close();
           });
+    })
+})
+//updatecustomerdetails
+app.post("/api/updatecustomerdetails",(req,res)=>{
+    MongoClient.connect(url, function(err, db) {
+        if (err) throw err;
+        var dbo = db.db("Kishore");
+        var o_id = new ObjectId(req.body.id)
+        var data = [
+            {
+            $set:{
+            first_name: req.body.fn,
+            last_name: req.body.ln,
+            address: req.body.addr,
+            pincode: req.body.pin,
+            district: req.body.dist,
+            city: req.body.city,
+            mobile_no: req.body.mobile
+            }
+        }
+        ]
+        dbo.collection("customers").updateMany({"_id":o_id},data,function(err,result){
+            if (err) throw err;
+            res.json({
+                "status":200,
+                "message":"Updated successfully"
+            })
+        })
     })
 })
 //retriveproduct
