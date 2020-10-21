@@ -43,7 +43,8 @@ app.post("/api/signup" ,(req,res)=>{
         district:null,
         city:null,
         pincode:null,
-        orders:[]
+        orders:[],
+        wishlist:[]
      }
      dbo.collection("customers").insertOne(query, function(err, res1) {
          if (err) throw err;
@@ -197,6 +198,7 @@ app.post("/retriveproduct",(req,res)=>{
         var o_id = new ObjectId(req.body.product_id);
         dbo.collection("products").find({"_id": o_id}).toArray(function(err, result) {
             if (err) throw err;
+            console.log(result[0])
             res.send(result[0])
             db.close();
           });
@@ -240,7 +242,7 @@ app.post("/placeorder",(req,res)=>{
     })
 })
 //wishlist
-app.post("/wishlist",(req,res)=>{
+app.post("/addtowishlist",(req,res)=>{
     MongoClient.connect(url, function(err, db) {
         if (err) throw err;
         var dbo = db.db("Kishore");
