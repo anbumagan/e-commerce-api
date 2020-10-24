@@ -168,7 +168,7 @@ app.post("/retriveorders",(req,res)=>{
         if (err) throw err;
         var dbo = db.db("Kishore");
         var o_id = new ObjectId(req.body.id);
-        dbo.collection("customers").find({"_id": o_id},{projection:{_id:0,orders: 1}}).toArray(function(err, result) {
+        dbo.collection("customers").find({"_id": o_id}).toArray(function(err, result) {
             if (err) throw err;
             var orders = result[0].orders
             res.send(orders)
@@ -176,16 +176,20 @@ app.post("/retriveorders",(req,res)=>{
           });
     })
 })
-//wishlists
 app.post("/retrivewishlist",(req,res)=>{
     MongoClient.connect(url, function(err, db) {
         if (err) throw err;
         var dbo = db.db("Kishore");
         var o_id = new ObjectId(req.body.id);
-        dbo.collection("customers").find({"_id": o_id},{projection:{_id:0,wishlist: 1}}).toArray(function(err, result) {
+        dbo.collection("customers").find({"_id": o_id}).toArray(function(err, result) {
             if (err) throw err;
-            var wishlist = result[0].wishlist
-            res.json(wishlist)
+            if(result[0].wishlist.length!=0){
+                res.json(result[0].wishlist)
+            }else{
+                res.json({
+                    status: "null"
+                })
+            }
             db.close();
           });
     })
@@ -198,7 +202,6 @@ app.post("/retriveproduct",(req,res)=>{
         var o_id = new ObjectId(req.body.product_id);
         dbo.collection("products").find({"_id": o_id}).toArray(function(err, result) {
             if (err) throw err;
-            console.log(result[0])
             res.send(result[0])
             db.close();
           });
@@ -542,16 +545,38 @@ var powerbanks = [
     }
 ]
 
-
+for (let i = 0; i < carousel.length; i++){
+    (function(i){
+        app.get("/"+carousel[i], function(req, res){
+        res.sendFile(__dirname + '/assets/img/Caroussel/'+ carousel[i])
+    })})(i);
+}
+for (let i = 0; i < laptop.length; i++){
+    (function(i){
+        app.get("/"+laptop[i].name, function(req, res){
+        res.sendFile(__dirname + '/assets/img/Laptops/'+ laptop[i].name)
+    })})(i);
+}
+for (let i = 0; i < tv.length; i++){
+    (function(i){
+        app.get("/"+tv[i].name, function(req, res){
+        res.sendFile(__dirname + '/assets/img/tv/'+ tv[i].name)
+    })})(i);
+}
+for (let i = 0; i < mobiles.length; i++){
+    (function(i){
+        app.get("/"+mobiles[i].name, function(req, res){
+        res.sendFile(__dirname + '/assets/img/mobiles/'+ mobiles[i].name)
+    })})(i);
+}
 MongoClient.connect(url,function(err,db){
     if(err) throw err;
     var dbo = db.db("Kishore");
     dbo.collection("carousel").remove();
     for(var i=0;i<carousel.length;i++){
-        var base64 = fs.readFileSync(__dirname + '/assets/img/Caroussel/'+ carousel[i]+'')
         var query={
             name: carousel[i],
-            data: base64
+            data: 'http://192.168.43.55:8080/'+carousel[i]
         }
         dbo.collection("carousel").insertOne(query,function(err,result){
             if(err) throw err;
@@ -563,82 +588,42 @@ MongoClient.connect(url,function(err,db){
 MongoClient.connect(url,function(err,db){
     if(err) throw err;
     var dbo = db.db("Kishore");
-    var o_id = new ObjectId("5efefb8bec77111d586dfb93");
-        var data ={
-            description:[
-                    {
-                        "title": "processor",
-                        "desc":"10th Generation Intel® Core™ i5",
-                    },
-                    {
-                        "title": "display",
-                        "desc":"35.56cm (14) FHD Anti-glare Display",
-                    },
-                    {
-                        "title": "graphics",
-                        "desc": "NVIDIA® GeForce® MX250 / Intel® UHD Graphics 620",
-                    },
-                    {
-                        "title": "storage",
-                        "desc": "256GB / 512GB SATA 3 SSD",
-                    },
-                    {
-                        "title":"memory",
-                        "desc":"8GB 2666MHz DDR4 RAM"
-                    },
-                    {
-                        "desc": "Windows 10 home",
-                        "title":"os"
-                    },
-                    {
-                        "title":"battery",
-                        "desc":"46Wh Battery.Backup of up to 10Hrs.65W Power Adapter"
-                    },{
-                        "title":"ports",
-                        "desc":"2 x Type-A USB 3.1 Gen 1--1 x USB 2.0--1 x HDMI--1 x Combo Audio Jack--1 x DC-jack"
-                    },
-                    {
-                        "title":"audio",
-                        "desc":"2x2W Stereo Speakers-DTS Audio Processing App Support-3.5mm headphone jack"
-                    },
-                    {
-                        "title":"conn",
-                        "desc":"Wireless LAN:Dual-band 802.11ac Wi-Fi--Bluetooth:Bluetooth V5.0"
-                    },
-                    {
-                        "title":"design",
-                        "desc":"17.95mm--323mm--228mm--1.5kg--Thin and Light"
-                    },
-                    {
-                        "title":"box",
-                        "desc":"Mi Notebook 14 x 1U--Power Adapter with Power Cord x 1U--User Manual x 1U--Mi Webcam HD 720p x1U(Free with the Mi Notebook 14, will be given as a separate bundle)"
-                    }
-                ]
-        }
-        
-                
-        dbo.collection("products").update({"_id": o_id},data,function(err, result){
-            if(err) throw err;
-            console.log("inserted ")
-        })
-    })
-*/
-/*
-MongoClient.connect(url,function(err,db){
-    if(err) throw err;
-    var dbo = db.db("Kishore");
+    dbo.collection("products").remove();
     for(var i=0;i<laptop.length;i++){
-        var base64 = fs.readFileSync(__dirname + '/assets/img/Laptops/'+ laptop[i].name+'')
         var query={
             name: laptop[i].brand,
-            data: base64,
+            data: 'http://192.168.43.55:8080/'+laptop[i].name,
             price: laptop[i].price,
             category: laptop[i].category,
             description: laptop[i].description
         }
         dbo.collection("products").insertOne(query,function(err,result){
             if(err) throw err;
-            console.log("inserted")
+            console.log("inserted lap")
+        })
+    }
+    for(var i=0;i<mobiles.length;i++){
+        var query={
+            name: mobiles[i].brand,
+            data: 'http://192.168.43.55:8080/'+mobiles[i].name,
+            price: mobiles[i].price,
+            category: mobiles[i].category,
+        }
+        dbo.collection("products").insertOne(query,function(err,result){
+            if(err) throw err;
+            console.log("inserted mob")
+        })
+    }
+    for(var i=0;i<tv.length;i++){
+        var query={
+            name: tv[i].brand,
+            data: 'http://192.168.43.55:8080/'+tv[i].name,
+            price: tv[i].price,
+            category: tv[i].category,
+        }
+        dbo.collection("products").insertOne(query,function(err,result){
+            if(err) throw err;
+            console.log("inserted tv")
         })
     }
 })*/
@@ -728,8 +713,6 @@ app.get("/mobiles",(req,res)=>{
 })
 })
 app.get("/image",(req,res)=>{
-    res.json({
-        data: fs.readFileSync(__dirname + '/assets/img/Laptops/002.jpg','base64')
-    })
+    res.sendFile(__dirname+'/assets/img/Laptops/002.png')
 })
 app.listen(8080,()=> console.log('listening.....8080'))
