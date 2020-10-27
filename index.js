@@ -200,11 +200,54 @@ app.post("/retriveproduct",(req,res)=>{
         if (err) throw err;
         var dbo = db.db("Kishore");
         var o_id = new ObjectId(req.body.product_id);
+        var vc=0
         dbo.collection("products").find({"_id": o_id}).toArray(function(err, result) {
             if (err) throw err;
+            vc = result[0].viewCount
+            dbo.collection('products').updateOne({"_id":o_id},{$set:{viewCount: vc+1 }})
+
             res.send(result[0])
             db.close();
           });
+    })
+})
+//cancelorder
+app.post("/cancelorder",(req,res)=>{
+    MongoClient.connect(url, function(err, db) {
+        if (err) throw err;
+        var dbo = db.db("Kishore");
+        var o_id = new ObjectId(req.body.id);
+        var data ={
+            $set: {
+                orders: {
+                  product_id: req.body.product_id,
+                  date: req.body.date,
+                  deliverstatus: "cancelled"
+                }
+              }
+        }
+        dbo.collection("customers").updateMany({"_id": o_id},{
+            
+                orders: [{$set:{
+                  product_id: req.body.product_id,
+                  date: req.body.date,
+                  deliverstatus: "cancelled"
+                }}]
+              
+        },function(err,result1){
+            if(err) throw err;
+            if(result1.result.nModified!=0){
+                res.json({
+                    status: 200,
+                    message: "order cancelled"
+                })
+            }else{
+                res.json({
+                    status: 404,
+                    message: "Product not found"
+                })
+            }
+        })
     })
 })
 //placeorder
@@ -236,6 +279,16 @@ app.post("/placeorder",(req,res)=>{
                     message: "Unable to place order"
                 })
             }else{
+                console.log(req.body.productId)
+                var bc=0
+                dbo.collection("products").find({"_id": ObjectId(req.body.productId)}).toArray(function(err, result2) {
+                    if (err) throw err;
+                    console.log(result2)
+                    bc = result2[0].buyCount
+                    dbo.collection('products').updateOne({"_id":ObjectId(req.body.productId)},{$set:{buyCount: bc+1 }})
+
+                    db.close();
+                });
                 res.json({
                     status: 200,
                     message: "Order placed successfully"
@@ -328,6 +381,29 @@ app.post("/removewishlist",(req,res)=>{
         })
     })
 })
+//mostbought
+app.get("/mostviewed",(req,res)=>{
+    MongoClient.connect(url, function(err, db) {
+        if (err) throw err;
+        var dbo = db.db("Kishore");
+        dbo.collection("products").find({viewCount:{$gt: 5}},{projection:{_id:1}}).toArray(function(err, result) {
+            if (err) throw err;
+            res.json(result)
+          });
+    }) 
+})
+//mostviewed
+app.get("/mostbuyed",(req,res)=>{
+    MongoClient.connect(url, function(err, db) {
+        if (err) throw err;
+        var dbo = db.db("Kishore");
+        dbo.collection("products").find({buyCount:{$gt: 5}},{projection:{_id:1}}).toArray(function(err, result) {
+            if (err) throw err;
+            res.json(result)
+          });
+    }) 
+})
+
 var carousel = ['mi10.jpg','mibox4k.jpg','mioutdoor.jpg','redminote8pro.jpg','mi-notebook.jpg']
 var laptop = [
     {
@@ -569,6 +645,7 @@ for (let i = 0; i < mobiles.length; i++){
         res.sendFile(__dirname + '/assets/img/mobiles/'+ mobiles[i].name)
     })})(i);
 }
+
 MongoClient.connect(url,function(err,db){
     if(err) throw err;
     var dbo = db.db("Kishore");
@@ -576,7 +653,7 @@ MongoClient.connect(url,function(err,db){
     for(var i=0;i<carousel.length;i++){
         var query={
             name: carousel[i],
-            data: 'http://192.168.43.55:8080/'+carousel[i]
+            data: 'http://192.168.225.123:8000/'+carousel[i]
         }
         dbo.collection("carousel").insertOne(query,function(err,result){
             if(err) throw err;
@@ -592,10 +669,12 @@ MongoClient.connect(url,function(err,db){
     for(var i=0;i<laptop.length;i++){
         var query={
             name: laptop[i].brand,
-            data: 'http://192.168.43.55:8080/'+laptop[i].name,
+            data: 'http://192.168.225.123:8000/'+laptop[i].name,
             price: laptop[i].price,
             category: laptop[i].category,
-            description: laptop[i].description
+            description: laptop[i].description,
+            viewCount: 0,
+            buyCount: 0
         }
         dbo.collection("products").insertOne(query,function(err,result){
             if(err) throw err;
@@ -605,9 +684,11 @@ MongoClient.connect(url,function(err,db){
     for(var i=0;i<mobiles.length;i++){
         var query={
             name: mobiles[i].brand,
-            data: 'http://192.168.43.55:8080/'+mobiles[i].name,
+            data: 'http://192.168.225.123:8000/'+mobiles[i].name,
             price: mobiles[i].price,
             category: mobiles[i].category,
+            viewCount: 0,
+            buyCount:0
         }
         dbo.collection("products").insertOne(query,function(err,result){
             if(err) throw err;
@@ -617,53 +698,20 @@ MongoClient.connect(url,function(err,db){
     for(var i=0;i<tv.length;i++){
         var query={
             name: tv[i].brand,
-            data: 'http://192.168.43.55:8080/'+tv[i].name,
+            data: 'http://192.168.225.123:8000/'+tv[i].name,
             price: tv[i].price,
             category: tv[i].category,
+            viewCount: 0,
+            buyCount: 0
         }
         dbo.collection("products").insertOne(query,function(err,result){
             if(err) throw err;
             console.log("inserted tv")
         })
     }
-})*/
-//mobiles
-/*
-MongoClient.connect(url,function(err,db){
-    if(err) throw err;
-    var dbo = db.db("Kishore");
-    for(var i=0;i<mobiles.length;i++){
-        var base64 = fs.readFileSync(__dirname + '/assets/img/mobiles/'+ mobiles[i].name+'')
-        var query={
-            name: mobiles[i].brand,
-            data: base64,
-            price: mobiles[i].price,
-            category: mobiles[i].category,
-        }
-        dbo.collection("products").insertOne(query,function(err,result){
-            if(err) throw err;
-            console.log("inserted")
-        })
-    }
 })
-//tv
-MongoClient.connect(url,function(err,db){
-    if(err) throw err;
-    var dbo = db.db("Kishore");
-    for(var i=0;i<tv.length;i++){
-        var base64 = fs.readFileSync(__dirname + '/assets/img/tv/'+ tv[i].name+'')
-        var query={
-            name: tv[i].brand,
-            data: base64,
-            price: tv[i].price,
-            category: tv[i].category,
-        }
-        dbo.collection("products").insertOne(query,function(err,result){
-            if(err) throw err;
-            console.log("inserted")
-        })
-    }
-})*/
+*/
+
 //Carousel
 app.get("/carousel",(req,res)=>{
     MongoClient.connect(url, function(err, db) {
@@ -715,4 +763,4 @@ app.get("/mobiles",(req,res)=>{
 app.get("/image",(req,res)=>{
     res.sendFile(__dirname+'/assets/img/Laptops/002.png')
 })
-app.listen(8080,()=> console.log('listening.....8080'))
+app.listen(8000,()=> console.log('listening.....8000'))
