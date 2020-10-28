@@ -386,9 +386,15 @@ app.get("/mostviewed",(req,res)=>{
     MongoClient.connect(url, function(err, db) {
         if (err) throw err;
         var dbo = db.db("Kishore");
-        dbo.collection("products").find({viewCount:{$gt: 5}},{projection:{_id:1}}).toArray(function(err, result) {
+        dbo.collection("products").find({viewCount:{$gt: 5}},{projection:{description:0}}).toArray(function(err, result) {
             if (err) throw err;
-            res.json(result)
+            if(result.length!=0){
+            res.json(result)}
+            else{
+                dbo.collection('products').find({},{projection:{description:0}}).toArray(function(err, result){
+                    res.json(result.slice(0,3))
+                })
+            }
           });
     }) 
 })
@@ -397,9 +403,15 @@ app.get("/mostbuyed",(req,res)=>{
     MongoClient.connect(url, function(err, db) {
         if (err) throw err;
         var dbo = db.db("Kishore");
-        dbo.collection("products").find({buyCount:{$gt: 5}},{projection:{_id:1}}).toArray(function(err, result) {
+        dbo.collection("products").find({buyCount:{$gt: 3}},{projection:{description:0}}).toArray(function(err, result) {
             if (err) throw err;
-            res.json(result)
+            if(result.length!=0){
+            res.json(result)}
+            else{
+                dbo.collection('products').find({},{projection:{description:0}}).toArray(function(err, result){
+                    res.json(result.slice(0,3))
+                })
+            }
           });
     }) 
 })
@@ -411,6 +423,7 @@ var laptop = [
         brand: 'mi notebook 14',
         price: 41999,
         category: "laptops",
+        highlights:"The Mi Notebook 14 is more affordable than the Mi Notebook 14 Horizon edition, but loses some of the premium styling and specifications. It weighs 1.5kg and is under 18mm thick. You get a 14-inch full-HD anti-reflective screen, which is somewhat dull but has good viewing angles. All three variants use the same quad-core Intel Core i5-10210U processor which is based on the 'Comet Lake' architecture, and have 8GB of DDR4-2666 RAM which is soldered and not upgradeable. You can choose between a 256GB or 512GB SATA SSD, and optional Nvidia GeForce MX250 discrete GPU.",
         description:[
             {
                 "title": "processor",
@@ -465,6 +478,7 @@ var laptop = [
         name: '002.png',
         brand: 'mi notebook 14 (horizon edition)',
         price: 54999,
+        highlights:"Mi Notebook 14 Horizon Edition is stunningly compact, thin, and weighs just 1.35kg. A beautifully designed 35.5cm (14) Horizon display with super-thin 3mm bezels gives you an immersive viewing experience that you will love on the laptop. Equipped with the 10th Generation Intel® Core™ i5 Processor, the Mi Notebook 14 Horizon Edition is a productivity powerhouse that lets you multitask like a Pro Whether it’s binge-watching, coding or designing you will experience the Mi Notebook delivering on the promise of speed and performance at its best. There is nothing better than casually gaming on the Mi Notebook Horizon Edition as it comes with one of India's first NVIDIA® GeForce® MX350 and gives you unmatched results. With 5 times faster transfer speeds, boot-ups and game-loads, it comes with a 512GB SSD. Designed for an effortless typing experience, it comes with scissor switch keys with a travel distance of 1.3mm, making typing more precise than ever. With all of this and also a 46Wh Battery with 10 Hour Backup, we’ve got you covered for the whole day",
         category: "laptops",
         description:[
             {
@@ -511,7 +525,7 @@ var laptop = [
                 "desc":"17.15mm--321mm--206.8mm--1.35kg--Super Thin Bezels & Ultra Light"
             },
             {
-                "title":"box",
+                "title":"box contents",
                 "desc":"Mi Notebook 14 Horizon Edition x 1U--Power Adapter with Power Cord x 1U--User Manual x 1U--Mi Webcam HD 720p x1U(Free with the Mi Notebook 14 Horizon Edition, will be given as a separate bundle)"
             }
         ]
@@ -523,27 +537,183 @@ var tv = [
         brand: 'mi TV 4A pro',
         size: "43",
         price: 21999,
-        category: "television"
+        highlights:"There is no fun in watching your favourite movie or show on a TV where the display quality is poor. Now, boost the fun and watch them all in good and clear-quality on this 108 cm (43) Mi smart TV. Its Full HD display can accentuate your viewing experience and make it better. You can even access video streaming apps on it and never run out of quality-content to watch and enjoy. It comes with speakers which that deliver powerful audio which lets you experience the environment of a cinema hall right in your bedroom or living room.",
+        category: "television",
+        description:[
+            {
+                "title":"display and size",
+                "desc":"LED 108 cm (43 inches)"
+            },
+            {
+                "title":"resolution",
+                "desc":"Full HD 1920 x 1080 Pixels 60Hz refresh rate"
+            },
+            {
+                "title":"sound",
+                "desc":"20Watt speakers"
+            },
+            {
+                "title":"supported apps",
+                "desc":"Netflix--Prime Video--Disney+ Hotstar-YouTube--5000+ apps from Google Play Store"
+            },
+            {
+                "title":"OS",
+                "desc":"Android (Google Assistant & Chromecast in-built)"
+            },
+            {
+                "title":"storage and RAM",
+                "desc":"8GB/1GB"
+            },
+            {
+                "title":"connectivity",
+                "desc":"Wireless LAN:2.4GHz--Bluetooth:Bluetooth V4.1"
+            },
+            {
+                "title":"ports",
+                "desc":"3 x USB ports--An Antenna input--AV port--3 x HDMI ports--An Ethernet port--3.5mm headphone jack"
+            },
+            {
+                "title":"box contents",
+                "desc":"1 x LED TV--Table Top Stands--1 x User Manual--1 x Warranty Card--1 x Remote Control--screw bag--Power cord"
+            },
+        ]
     },
     {
         name: 'mi4cpro32.png',
         brand: 'mi TV 4C pro',
         size: "32",
         price: 14499,
-        category: "television"
+        highlights:"Equipped with a HD-Ready display, enjoy your multimedia content, favourite TV shows and movies in stunning quality. With a perfect balance of contrast and brightness, this television reproduces authentic colours and excellent clarity, giving you an immersive viewing experience.",
+        category: "television",
+        description:[
+            {
+                "title":"display and size",
+                "desc":"LED 80 cm (32 inches)"
+            },
+            {
+                "title":"resolution",
+                "desc":"HD Ready 1366 x 768 pixels 60Hz refresh rate"
+            },
+            {
+                "title":"sound",
+                "desc":"20Watt speakers"
+            },
+            {
+                "title":"supported apps",
+                "desc":"Netflix--Prime Video--Disney+ Hotstar-YouTube--5000+ apps from Google Play Store"
+            },
+            {
+                "title":"OS",
+                "desc":"Android (Google Assistant & Chromecast in-built)"
+            },
+            {
+                "title":"storage and RAM",
+                "desc":"8GB/1GB"
+            },
+            {
+                "title":"connectivity",
+                "desc":"Wireless LAN:2.4GHz--Bluetooth:Bluetooth V4.1"
+            },
+            {
+                "title":"ports",
+                "desc":"2 x USB ports--An Antenna input--AV port--3 x HDMI ports--An Ethernet port--3.5mm headphone jack"
+            },
+            {
+                "title":"box contents",
+                "desc":"1 x LED TV--Table Top Stands--1 x User Manual--1 x Warranty Card--1 x Remote Control--screw bag--Power cord"
+            },
+        ]
     },{
         name: 'mi4pro55.png',
         brand: 'mi TV 4 pro',
         size: "55",
         price: 47999,
-        category: "television"
+        highlights:"The Mi LED TV 4 PRO 138.88 cm (55) dons features such as Full-HD ultra bright display, 64-bit quad-core cortex A53 with Mali-450 MP3 for smooth interactions , PatchWall comes with over 7,00,000 hours of content right on your home page that adapts automatically according to latest trends and topics, multiple ports to connect upto 3 HDMI devices(1ARC) and 3 USBs along with SPDIF, 3.5mm Aux-in. The simple 11 button Mi Remote can control both TV and set-top box (Mi IR Cable required). The Mi LED TV 4 PRO 138.88 cm (55) is the smart Android TV that has almost everything that you are looking for in a TV and is super easy to use.",
+        category: "television",
+        description:[
+            {
+                "title":"display and size",
+                "desc":"LED 138 cm (55 inches)"
+            },
+            {
+                "title":"resolution",
+                "desc":"4K HDR 3840 x 2160 Pixels 60Hz refresh rate"
+            },
+            {
+                "title":"sound",
+                "desc":"20Watt speakers"
+            },
+            {
+                "title":"supported apps",
+                "desc":"Netflix--Prime Video--Disney+ Hotstar-YouTube--5000+ apps from Google Play Store"
+            },
+            {
+                "title":"OS",
+                "desc":"Android (Google Assistant & Chromecast in-built)"
+            },
+            {
+                "title":"storage and RAM",
+                "desc":"8GB/2GB"
+            },
+            {
+                "title":"connectivity",
+                "desc":"Wireless LAN:2.4GHz--Bluetooth:Bluetooth V4.1"
+            },
+            {
+                "title":"ports",
+                "desc":"3 x USB ports--An Antenna input--AV port--3 x HDMI ports--An Ethernet port"
+            },
+            {
+                "title":"box contents",
+                "desc":"1 x LED TV--Table Top Stands--1 x User Manual--1 x Warranty Card--1 x Remote Control--screw bag--Power cord"
+            },
+        ]
     },
     {
         name: 'mi4x65.jpg',
         brand: 'mi TV 4X ',
         size: "65",
         price: 54999,
-        category: "television"
+        highlights:"There is no fun in watching your favourite movie or show on a TV where the display quality is poor. Now, don’t ruin the fun and watch them all in good and clear-quality on this 163.9 cm (65) Mi smart TV. Its 4K display can accentuate your viewing experience and make it better. You can even access video streaming apps on it and never run out of quality-content to watch and enjoy. It comes with multiple speakers that deliver powerful audio which lets you experience the environment of a cinema hall right in your bedroom or living room.",
+        category: "television",
+        description:[
+            {
+                "title":"display and size",
+                "desc":"LED 163 cm (65 inches)"
+            },
+            {
+                "title":"resolution",
+                "desc":"4K HDR+ 3840x2160 Pixels 60Hz refresh rate"
+            },
+            {
+                "title":"sound",
+                "desc":"20 Watts Output--Quad Driver Speakers--Dolby+ DTS-HD"
+            },
+            {
+                "title":"supported apps",
+                "desc":"Netflix--Prime Video--Disney+ Hotstar-YouTube--5000+ apps from Google Play Store"
+            },
+            {
+                "title":"OS",
+                "desc":"Android (Google Assistant & Chromecast in-built)"
+            },
+            {
+                "title":"storage and RAM",
+                "desc":"16GB/2GB"
+            },
+            {
+                "title":"connectivity",
+                "desc":"Wireless LAN:2.4GHz/3GHz--Bluetooth:Bluetooth V5.0"
+            },
+            {
+                "title":"ports",
+                "desc":"3 x USB ports--An Antenna input--AV port--3 x HDMI ports--An Ethernet port"
+            },
+            {
+                "title":"box contents",
+                "desc":"1 x LED TV--Table Top Stands--1 x User Manual--1 x Warranty Card--1 x Remote Control--screw bag--Power cord"
+            },
+        ]
     },
 ]
 var mobiles = [
@@ -553,7 +723,42 @@ var mobiles = [
         spec: "4GB+64GB",
         processor:"Qualcomm Snapdragon 439 Processor",
         price: 9499,
-        category: "mobiles"
+        highlights:"If you are a travel blogger, gamer, entertainment seeker, or a person who loves a high-end personal device, then the Redmi 8 has been created to meet your needs. This smartphone features a 15.8-cm (6.22) Dot Notch Display, a 12 MP + 2 MP AI Dual Camera, and a 5000 mAh High-capacity Battery to offer detailed views of the stunning photos that you can click all day long without running out of battery life.",
+        category: "mobiles",
+        description:[
+            {
+                "title":"display",
+                "desc":"15.8 cm (6.22 inch) HD+ Display"
+            },
+            {
+                "title":"storage and RAM",
+                "desc":"4 GB RAM--64 GB ROM--Expandable Upto 512 GB"
+            },
+            {
+                "title":"cameras",
+                "desc":"12MP + 2MP Back Camera--8MP Front Camera"
+            },
+            {
+                "title":"processor",
+                "desc":"Qualcomm Snapdragon 439"
+            },
+            {
+                "title":"GPU",
+                "desc":"Adreno 505 at 650 MHz"
+            },
+            {
+                "title":"battery",
+                "desc":"5000 mAh (Supports 18W fast charging)"
+            },
+            {
+                "title":"connectivity",
+                "desc":"Network type: 4G VoLTE, 4G LTE, WCDMA, GSM, Wifi--Bluetooth: V4.2"
+            },
+            {
+                "title":"box contents",
+                "desc":"Handset--Mobile Cover--Data Cable--Charger Adapter--Manual--SIM Card Ejector"
+            },
+        ]
     },
     {
         name: 'miA3.jpg',
@@ -561,7 +766,42 @@ var mobiles = [
         spec: "6GB+128GB",
         processor:"Qualcomm Snapdragon 665 Processor",
         price: 14645,
-        category: "mobiles"
+        highlights:"Boasting a reflective coating and a nano-level holographic pattern, this smartphone from Mi looks jawdropping. It also features a Qualcomm Snapdragon 665 AIE processor that packs a punch when it comes to smartphone performance. And, if you’re an entertainment enthusiast, then you can take advantage of its 15.4-centimetre (6.08) Super AMOLED display to watch your favourite videos in high definition.",
+        category: "mobiles",
+        description:[
+            {
+                "title":"display",
+                "desc":"15.44 cm (6.08 inch)--HD+ Super AMOLED Display--Corning Gorilla Glass on Front, Back and Camera Modules, 3D Curved Glass Back Design--Splash Proof by P2i"
+            },
+            {
+                "title":"storage and RAM",
+                "desc":"6 GB RAM--128 GB ROM Expandable Upto 256 GB"
+            },
+            {
+                "title":"cameras",
+                "desc":"48MP + 8MP + 2MP Back Camera--32MP Front Camera"
+            },
+            {
+                "title":"processor",
+                "desc":"Qualcomm Snapdragon 665 Processor"
+            },
+            {
+                "title":"GPU",
+                "desc":"Adreno 610"
+            },
+            {
+                "title":"battery",
+                "desc":"4030 mAh (Supports 18W fast charging)"
+            },
+            {
+                "title":"connectivity",
+                "desc":"Network type: 4G VoLTE, 4G LTE, WCDMA, GSM, Wifi--Bluetooth: V5.0"
+            },
+            {
+                "title":"box contents",
+                "desc":"Handset--Power Adapter(18W)--USB Cable--Warranty Card--User Guide--SIM Tray Ejection Tool--Back Cover"
+            },
+        ]
     },
     {
         name: 'mik20pro.jpg',
@@ -569,7 +809,42 @@ var mobiles = [
         spec: "6GB+128GB",
         processor:"Qualcomm Snapdragon 855 Processor",
         price: 24999,
-        category: "mobiles"
+        highlights:"The K20 Pro opens up new possibilities. The blazing-fast processor Qualcomm Snapdragon 855 gives you peak performance, while a 48 MP Triple camera setup lets you see things from a different perspective altogether. Be it gaming or everyday tasks this device handles it flawlessly. The beautiful 16.23-cm (6.39) Horizon AMOLED display is a delight when it comes to viewing content on the go. The Aura Prime design gives the device a unique look while the Corning Gorilla Glass 5 on the front and back enhances the overall user experience.",
+        category: "mobiles",
+        description:[
+            {
+                "title":"display",
+                "desc":"16.23 cm (6.39 inch) Full HD+ Display"
+            },
+            {
+                "title":"storage and RAM",
+                "desc":"6 GB RAM--128 GB ROM"
+            },
+            {
+                "title":"cameras",
+                "desc":"48MP + 13MP + 8MP Back Camera--20MP Popup Front Camera"
+            },
+            {
+                "title":"processor",
+                "desc":"Qualcomm Snapdragon 855 Processor"
+            },
+            {
+                "title":"GPU",
+                "desc":"Adreno 640"
+            },
+            {
+                "title":"battery",
+                "desc":"4000 mAh (Supports 27W fast charging)"
+            },
+            {
+                "title":"connectivity",
+                "desc":"Network type: 4G VoLTE, 4G LTE, WCDMA, GSM, Wifi(2.4Ghz, 5Ghz)--Bluetooth: V5.0"
+            },
+            {
+                "title":"box contents",
+                "desc":"Redmi K20 Pro--Power adapter(27W)--Simple protective cover--USB Type-C cable--SIM eject tool--User guide--Warranty card"
+            },
+        ]
     }
 ]
 var streamingdevice = [
@@ -653,7 +928,7 @@ MongoClient.connect(url,function(err,db){
     for(var i=0;i<carousel.length;i++){
         var query={
             name: carousel[i],
-            data: 'http://192.168.225.123:8000/'+carousel[i]
+            data: 'http://192.168.43.55:8080/'+carousel[i]
         }
         dbo.collection("carousel").insertOne(query,function(err,result){
             if(err) throw err;
@@ -669,10 +944,11 @@ MongoClient.connect(url,function(err,db){
     for(var i=0;i<laptop.length;i++){
         var query={
             name: laptop[i].brand,
-            data: 'http://192.168.225.123:8000/'+laptop[i].name,
+            data: 'http://192.168.43.55:8080/'+laptop[i].name,
             price: laptop[i].price,
             category: laptop[i].category,
             description: laptop[i].description,
+            highlights:laptop[i].highlights,
             viewCount: 0,
             buyCount: 0
         }
@@ -684,9 +960,11 @@ MongoClient.connect(url,function(err,db){
     for(var i=0;i<mobiles.length;i++){
         var query={
             name: mobiles[i].brand,
-            data: 'http://192.168.225.123:8000/'+mobiles[i].name,
+            data: 'http://192.168.43.55:8080/'+mobiles[i].name,
             price: mobiles[i].price,
             category: mobiles[i].category,
+            description:mobiles[i].description,
+            highlights: mobiles[i].highlights,
             viewCount: 0,
             buyCount:0
         }
@@ -698,9 +976,11 @@ MongoClient.connect(url,function(err,db){
     for(var i=0;i<tv.length;i++){
         var query={
             name: tv[i].brand,
-            data: 'http://192.168.225.123:8000/'+tv[i].name,
+            data: 'http://192.168.43.55:8080/'+tv[i].name,
             price: tv[i].price,
             category: tv[i].category,
+            description: tv[i].description,
+            highlights: tv[i].highlights,
             viewCount: 0,
             buyCount: 0
         }
@@ -763,4 +1043,4 @@ app.get("/mobiles",(req,res)=>{
 app.get("/image",(req,res)=>{
     res.sendFile(__dirname+'/assets/img/Laptops/002.png')
 })
-app.listen(8000,()=> console.log('listening.....8000'))
+app.listen(8080,()=> console.log('listening.....8080'))
